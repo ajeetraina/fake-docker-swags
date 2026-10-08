@@ -4,6 +4,8 @@
 > end inside **Docker Sandboxes** — local for dev, cloud for scale — where the
 > **LLM**, **MCP**, **Kits**, and **Policies** each do a real job.
 
+**Live store:** https://fakestore.dockerworkshop.com · **Full demo runbook:** [DEMO.md](./DEMO.md)
+
 An autonomous A/B testing agent built on Docker Sandboxes. The agent shops a
 deliberately-flawed store like a real user, finds where shoppers get stuck,
 writes a fix, proves it with a re-test, and opens a PR — and the two things

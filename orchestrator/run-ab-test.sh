@@ -23,6 +23,9 @@ TASKS="$REPO/orchestrator/tasks.txt"
 OUT="$REPO/.runs/$(date +%Y%m%d-%H%M%S 2>/dev/null || echo run)"
 PREVIEW_PORT="${PREVIEW_PORT:-8080}"
 DRY_RUN="${DRY_RUN:-1}"
+# Set BASE_URL to shop an externally-hosted baseline instead of a local preview
+# sandbox — e.g. the live site: BASE_URL=https://fakestore.dockerworkshop.com
+BASE_URL="${BASE_URL:-}"
 
 # run CMD...  — execute, or just print under DRY_RUN.
 run() {
@@ -42,18 +45,32 @@ phase "Phase 0 — policies"
 # policies/apply.sh shows the equivalent explicit per-sandbox rules.
 run sbx policy inspect
 
-# ── Phase 1: LOCAL preview — serve the baseline store ───────────────────────
-phase "Phase 1 — local preview (baseline)"
-run sbx run "$KITS/swag-store" "$STORE_DIR" --name swag-preview --detached
-run sbx ports swag-preview --publish "$PREVIEW_PORT:3000"
-BASE_URL="http://host.docker.internal:$PREVIEW_PORT"
-echo "  preview: http://localhost:$PREVIEW_PORT   (agents reach it at $BASE_URL)"
+# ── Phase 1: baseline preview — the live site, or a local sandbox ───────────
+phase "Phase 1 — baseline preview"
+if [ -n "$BASE_URL" ]; then
+  # Shop the externally-hosted baseline (the live GitHub Pages site). No local
+  # preview sandbox is needed — production IS the baseline; variants get their
+  # own ephemeral previews in Phase 4.
+  echo "  baseline: $BASE_URL  (external — skipping local preview sandbox)"
+else
+  run sbx run "$KITS/swag-store" "$STORE_DIR" --name swag-preview --detached
+  run sbx ports swag-preview --publish "$PREVIEW_PORT:3000"
+  BASE_URL="http://host.docker.internal:$PREVIEW_PORT"
+  echo "  preview: http://localhost:$PREVIEW_PORT   (agents reach it at $BASE_URL)"
+fi
 
-# ── Phase 2: LOCAL agent — simulate shoppers, capture baseline traces ───────
+# ── Phase 2: agent — simulate shoppers, capture baseline traces ─────────────
 phase "Phase 2 — simulate baseline (browser-use)"
 # A Claude sandbox composed with both mixins: it can shop AND orchestrate.
 run sbx run claude "$STORE_DIR" --name swag-agent \
   --kit "$KITS/browser-use" --kit "$KITS/ab-agent" --detached
+# The shopper must be allowed to reach the baseline host. For the live site,
+# open egress to its domain on the agent sandbox (the kits already allow the
+# local preview + api.anthropic.com).
+if [ -n "${BASE_URL##http://host.docker.internal*}" ]; then
+  host="$(printf '%s' "$BASE_URL" | sed -E 's#^https?://([^/:]+).*#\1#')"
+  run sbx policy allow network --sandbox swag-agent "$host"
+fi
 # Make the store-metrics MCP available to the agent through the gateway.
 run sbx mcp add store-metrics -- node "$REPO/mcp/store-metrics/dist/index.js"
 
