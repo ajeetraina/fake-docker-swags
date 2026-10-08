@@ -1,0 +1,12 @@
+{
+  "task": "Find something warm to wear and add it to your cart.",
+  "url": "http://preview:3000",
+  "steps": [
+    { "thought": "The page shows a big grid of 12 products all mixed together.", "action": "observe grid" },
+    { "thought": "I want something warm but there is no filter or search to narrow by category.", "action": "scroll down" },
+    { "thought": "Still scrolling past mugs and stickers, this is hard to find warm items.", "action": "scroll down" },
+    { "thought": "I can't easily find the hoodie among everything. I'll give up on narrowing.", "action": "scroll up" }
+  ],
+  "final": "Could not confidently find a warm item without a filter.",
+  "success": false
+}

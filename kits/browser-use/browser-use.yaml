@@ -1,0 +1,53 @@
+# syntax=docker/sandbox-kit:3
+# Browser-Use + Playwright (headless Chromium) as a MIXIN, so any agent
+# workload can be turned into a shopper simulator. It layers the Python tool
+# and a browser into the composition; the agent that drives it (Claude, Codex,
+# …) and that agent's credential ride with the workload underneath. This is the
+# "simulate realistic users" phase of the A/B loop, packaged once and reusable.
+schemaVersion: "3"
+kind: mixin
+displayName: Browser-Use (shopper simulator)
+author: "Ajeet Singh Raina"
+description: >-
+  Browser-Use with a headless Chromium (via Playwright) as an overlay. Compose
+  it onto an agent workload to let the agent navigate a preview URL like a real
+  shopper and log its reasoning step by step.
+sourceUrl: https://github.com/browser-use/browser-use
+
+args:
+  version:
+    default: "0.1.40"
+    pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'
+    description: browser-use PyPI release to install
+    buildArg: BROWSER_USE_VERSION
+  previewHost:
+    default: "host.docker.internal:443"
+    description: >-
+      Host:port of the swag-store preview the simulator shops against. Override
+      for a cloud run, e.g. a published preview hostname.
+
+provides: ["browser-use@${{ kit.args.version }}"]
+
+capabilities:
+  - type: com.docker.sandbox/network-policy@1
+    config:
+      # Build pulls the package from PyPI and the Chromium build from the
+      # Playwright CDN.
+      install:
+        allow:
+          - pypi.org
+          - files.pythonhosted.org
+          - playwright.azureedge.net
+          - cdn.playwright.dev
+      # At run time the simulator reaches two things: the preview URL it shops
+      # against, and the LLM that decides its next click. The preview host is
+      # an arg so a cloud run can point at a cloud preview; api.anthropic.com
+      # is where the proxy injects the agent's credential.
+      runtime:
+        allow:
+          - api.anthropic.com
+          - "${{ kit.args.previewHost }}"
+
+  - type: com.docker.sandbox/agent-context@1
+    config:
+      contentFile: ./browser-use-context.md

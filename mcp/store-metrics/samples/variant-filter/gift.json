@@ -1,0 +1,11 @@
+{
+  "task": "Buy a gift under $15 and add it to your cart.",
+  "url": "http://preview-variant:3000",
+  "steps": [
+    { "thought": "I can search and there is a price filter now.", "action": "type 'gift' in search" },
+    { "thought": "The results show gift-tagged items; the sticker pack is $7.99.", "action": "click sticker pack" },
+    { "thought": "Adding it to the cart.", "action": "add to cart" }
+  ],
+  "final": "Searched 'gift', found a cheap option, added to cart.",
+  "success": true
+}

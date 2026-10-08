@@ -1,0 +1,49 @@
+# syntax=docker/sandbox-kit:3
+# The A/B testing agent as a declaration-only MIXIN. It ships no binary: it
+# gives a Claude sandbox the playbook for the whole loop (simulate → analyze →
+# generate variants → score → PR) as agent context, the GitHub egress and
+# credential needed to open the winning pull request, and nothing else. The
+# agent it drives is `claude` and the shopper tool is `shop` — both must be in
+# the composition, so both are required.
+schemaVersion: "3"
+kind: mixin
+displayName: Swag Lab A/B agent
+author: "Ajeet Singh Raina"
+description: >-
+  Turns a Claude Code sandbox into the Swag Lab A/B testing agent: it carries
+  the loop playbook, plus the GitHub egress and credential to raise the winning
+  variant as a pull request. Compose onto `claude` together with `browser-use`.
+sourceUrl: https://github.com/ajeetraina/fake-docker-swags
+version: "0.1.0"
+
+provides: ["ab-agent@0.1.0"]
+
+# Hard preconditions on the composed runtime: the playbook runs `claude` to
+# write variants and `shop` to re-test them. A composition missing either is an
+# A/B agent that cannot act, so fail closed rather than compose a broken one.
+requires: ["claude", "browser-use"]
+
+capabilities:
+  # Opening the winning PR: gh / the GitHub MCP reach these hosts, and the
+  # proxy injects the GitHub token so the raw value never enters the VM. Only
+  # the runtime phase — nothing here runs at build.
+  - type: com.docker.sandbox/network-policy@1
+    config:
+      runtime:
+        allow:
+          - github.com
+          - api.github.com
+
+  - type: com.docker.sandbox/credential@1
+    optional: true
+    description: GitHub token used to open the winning-variant pull request
+    config:
+      service: github
+      phase: runtime
+      apiKey:
+        inject:
+          - { domain: api.github.com, header: Authorization, format: "Bearer %s" }
+
+  - type: com.docker.sandbox/agent-context@1
+    config:
+      contentFile: ./ab-agent-context.md

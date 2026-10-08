@@ -1,0 +1,11 @@
+{
+  "task": "Find something warm to wear and add it to your cart.",
+  "url": "http://preview-variant:3000",
+  "steps": [
+    { "thought": "There is a search box and category filters at the top now.", "action": "observe filters" },
+    { "thought": "I'll filter by the Apparel category to see warm clothing.", "action": "click Apparel filter" },
+    { "thought": "The Captain Hoodie looks warm. Adding it to the cart.", "action": "add to cart" }
+  ],
+  "final": "Filtered to Apparel and added the hoodie quickly.",
+  "success": true
+}

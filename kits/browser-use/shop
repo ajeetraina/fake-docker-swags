@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Thin launcher for the Browser-Use shopper simulator.
+#
+#   shop "<task>" <preview-url>
+#
+# Prints a JSON trace of the shopper's steps and reasoning to stdout, so the
+# orchestrator can capture it with `sbx exec ... shop ... > trace.json`.
+set -euo pipefail
+export PLAYWRIGHT_BROWSERS_PATH=/opt/ms-playwright
+exec /opt/browser-use/bin/python /opt/browser-use/shopper.py "$@"

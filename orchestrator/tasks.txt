@@ -1,0 +1,8 @@
+# Shopper goals, one per line. Written as goals a real person has — NOT as test
+# scripts — so the friction the simulator hits is friction a user would hit.
+# Blank lines and lines starting with # are ignored.
+
+Find something warm to wear and add it to your cart.
+Buy a gift for a friend, spend under $15.
+You only want drinkware — find a mug or bottle and add it.
+Look for Docker stickers for your laptop and add a pack.

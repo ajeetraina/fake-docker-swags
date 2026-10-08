@@ -1,0 +1,122 @@
+[
+  {
+    "id": "moby-plush",
+    "name": "Moby Dock Plush Whale",
+    "category": "Toys",
+    "price": 24.99,
+    "tags": ["plush", "mascot", "gift"],
+    "emoji": "🐳",
+    "description": "The one and only Moby Dock, in huggable plush form.",
+    "inStock": true
+  },
+  {
+    "id": "classic-tee",
+    "name": "Docker Classic Logo Tee",
+    "category": "Apparel",
+    "price": 19.99,
+    "tags": ["shirt", "cotton", "unisex"],
+    "emoji": "👕",
+    "description": "Soft cotton tee with the classic Docker whale logo.",
+    "inStock": true
+  },
+  {
+    "id": "hoodie",
+    "name": "Docker Captain Hoodie",
+    "category": "Apparel",
+    "price": 54.99,
+    "tags": ["hoodie", "warm", "captain"],
+    "emoji": "🧥",
+    "description": "Premium pullover hoodie for Docker Captains and fans alike.",
+    "inStock": true
+  },
+  {
+    "id": "sticker-pack",
+    "name": "Container Sticker Pack (12)",
+    "category": "Stickers",
+    "price": 7.99,
+    "tags": ["stickers", "laptop", "gift"],
+    "emoji": "🏷️",
+    "description": "Twelve die-cut vinyl stickers to deck out your laptop.",
+    "inStock": true
+  },
+  {
+    "id": "enamel-pin",
+    "name": "Whale Enamel Pin Set",
+    "category": "Stickers",
+    "price": 12.99,
+    "tags": ["pin", "enamel", "collectible"],
+    "emoji": "📌",
+    "description": "A set of three hard-enamel pins featuring Moby and friends.",
+    "inStock": false
+  },
+  {
+    "id": "coffee-mug",
+    "name": "Build Ship Run Mug",
+    "category": "Drinkware",
+    "price": 14.99,
+    "tags": ["mug", "ceramic", "coffee"],
+    "emoji": "☕",
+    "description": "15oz ceramic mug. Fits a lot of coffee and one big whale.",
+    "inStock": true
+  },
+  {
+    "id": "water-bottle",
+    "name": "Containerized Water Bottle",
+    "category": "Drinkware",
+    "price": 22.99,
+    "tags": ["bottle", "steel", "insulated"],
+    "emoji": "🍶",
+    "description": "Insulated stainless-steel bottle. Keeps your layers cold.",
+    "inStock": true
+  },
+  {
+    "id": "cap",
+    "name": "Moby Dad Cap",
+    "category": "Apparel",
+    "price": 18.99,
+    "tags": ["cap", "hat", "adjustable"],
+    "emoji": "🧢",
+    "description": "Adjustable cotton cap with an embroidered whale.",
+    "inStock": true
+  },
+  {
+    "id": "socks",
+    "name": "Container Crew Socks",
+    "category": "Apparel",
+    "price": 11.99,
+    "tags": ["socks", "comfy", "gift"],
+    "emoji": "🧦",
+    "description": "Cozy crew socks patterned with tiny containers.",
+    "inStock": true
+  },
+  {
+    "id": "notebook",
+    "name": "Dockerfile Notebook",
+    "category": "Office",
+    "price": 9.99,
+    "tags": ["notebook", "paper", "office"],
+    "emoji": "📓",
+    "description": "Dot-grid notebook with a Dockerfile cheatsheet inside the cover.",
+    "inStock": true
+  },
+  {
+    "id": "laptop-sleeve",
+    "name": "Layered Laptop Sleeve",
+    "category": "Office",
+    "price": 29.99,
+    "tags": ["sleeve", "laptop", "protective"],
+    "emoji": "💼",
+    "description": "Padded 15\" laptop sleeve printed with image layers.",
+    "inStock": true
+  },
+  {
+    "id": "beanie",
+    "name": "Winter Whale Beanie",
+    "category": "Apparel",
+    "price": 16.99,
+    "tags": ["beanie", "warm", "winter"],
+    "emoji": "🎩",
+    "description": "Knit beanie to keep your head warm while your builds run.",
+    "inStock": true
+  }
+]

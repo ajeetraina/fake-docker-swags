@@ -1,0 +1,12 @@
+{
+  "task": "Buy a gift under $15 and add it to your cart.",
+  "url": "http://preview:3000",
+  "steps": [
+    { "thought": "Lots of products, no way to sort or filter by price.", "action": "observe grid" },
+    { "thought": "I have to read each price one by one, too many to compare.", "action": "scroll down" },
+    { "thought": "Found the sticker pack at $7.99, that works as a gift.", "action": "click sticker pack" },
+    { "thought": "Adding it to the cart.", "action": "add to cart" }
+  ],
+  "final": "Added sticker pack after manually scanning prices.",
+  "success": true
+}

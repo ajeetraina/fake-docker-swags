@@ -1,0 +1,46 @@
+# syntax=docker/sandbox-kit:3
+# The preview environment for the Docker Swag Store, as a WORKLOAD. It owns a
+# Node rootfs and an entrypoint that installs and serves whatever store source
+# is mounted at /workspace, so a variant the coding agent just wrote shows up
+# live on the preview URL — the sandbox is the "clone repo + serve preview"
+# step from the A/B loop. No agent runs here; this kit is a long-running
+# service, so it declares long-running@1 and a published port, not sbx@1.
+schemaVersion: "3"
+kind: workload
+displayName: Docker Swag Store (preview)
+author: "Ajeet Singh Raina"
+description: >-
+  A Node preview environment that serves the fake-docker-swags storefront
+  mounted at /workspace on port 3000. Run it to get the public preview URL the
+  browser-use agent shops against.
+sourceUrl: https://github.com/ajeetraina/fake-docker-swags
+version: "0.1.0"
+
+provides: ["swag-store@0.1.0"]
+
+capabilities:
+  # The preview is a server that must outlive the client session driving the
+  # A/B loop — without this the sandbox auto-stops between phases and the URL
+  # goes dead mid-experiment.
+  - type: com.docker.sandbox/long-running@1
+
+  # The Vite dev server. The host reaches it with `sbx ports <name> --publish
+  # 8080:3000`; the service binds 0.0.0.0 (see vite.config.ts) so the proxy
+  # can see it.
+  - type: com.docker.sandbox/port@1
+    description: Vite dev server serving the storefront
+    config: { name: http, container: 3000 }
+
+  # The entrypoint runs `npm ci` on the mounted workspace at boot, so the npm
+  # registry must be reachable in the runtime phase, not just at build.
+  - type: com.docker.sandbox/network-policy@1
+    config:
+      install:
+        allow: [registry.npmjs.org]
+      runtime:
+        allow: [registry.npmjs.org]
+
+  - type: com.docker.sandbox/agent-context@1
+    config:
+      filename: SWAG_STORE.md
+      contentFile: ./swag-store-context.md
