@@ -1,4 +1,4 @@
-A fake swag store is a strong choice. Daytona’s winner used a broken demo store too. Making it the shared target for the whole challenge improves on that: every participant attacks the same store, so you can judge entries side by side.
+
 
 The idea: “Moby’s Swag Shop (demo)”
 
