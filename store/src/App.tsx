@@ -1,15 +1,19 @@
 import { useState } from "react";
 import rawProducts from "./data/products.json";
-import type { Product } from "./types";
+import rawReviews from "./data/reviews.json";
+import type { Product, Reviews } from "./types";
 import { ProductGrid } from "./components/ProductGrid";
+import { ProductModal } from "./components/ProductModal";
 import { Cart } from "./components/Cart";
 import { useCart } from "./useCart";
 
 const products = rawProducts as Product[];
+const reviews = rawReviews as Reviews;
 
 export function App() {
   const cart = useCart();
   const [cartOpen, setCartOpen] = useState(false);
+  const [selected, setSelected] = useState<Product | null>(null);
 
   // ──────────────────────────────────────────────────────────────────────
   // DELIBERATE FLAW — the thing the Swag Lab agent is meant to discover.
@@ -53,8 +57,21 @@ export function App() {
           </aside>
         )}
 
-        <ProductGrid products={visibleProducts} onAdd={cart.add} />
+        <ProductGrid
+          products={visibleProducts}
+          onAdd={cart.add}
+          onSelect={setSelected}
+        />
       </main>
+
+      {selected && (
+        <ProductModal
+          product={selected}
+          reviews={reviews[selected.id] ?? []}
+          onAdd={cart.add}
+          onClose={() => setSelected(null)}
+        />
+      )}
 
       <footer className="footer">
         <span>{products.length} products · fake-docker-swags demo store</span>

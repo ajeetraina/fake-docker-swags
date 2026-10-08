@@ -13,3 +13,11 @@ export interface CartLine {
   product: Product;
   qty: number;
 }
+
+export interface Review {
+  author: string;
+  rating: number;
+  text: string;
+}
+
+export type Reviews = Record<string, Review[]>;

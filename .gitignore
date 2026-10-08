@@ -4,3 +4,6 @@ dist
 .sbx
 .DS_Store
 *.local
+
+# The planted-trap answer key is kept OUT of the public repo on purpose.
+ANSWER-KEY.md

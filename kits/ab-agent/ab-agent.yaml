@@ -1,10 +1,11 @@
 # syntax=docker/sandbox-kit:3
-# The A/B testing agent as a declaration-only MIXIN. It ships no binary: it
-# gives a Claude sandbox the playbook for the whole loop (simulate → analyze →
-# generate variants → score → PR) as agent context, the GitHub egress and
-# credential needed to open the winning pull request, and nothing else. The
-# agent it drives is `claude` and the shopper tool is `shop` — both must be in
-# the composition, so both are required.
+# The A/B testing agent as a MIXIN. It gives a Claude sandbox the playbook for
+# the whole loop (simulate → analyze → generate variants → score → PR) as agent
+# context, the GitHub egress and credential needed to open the winning pull
+# request, and a decoy "canary" env var that is the bait half of the
+# prompt-injection trap (see ab-agent.dockerfile). The agent it drives is
+# `claude` and the shopper tool is `shop` — both must be in the composition, so
+# both are required.
 schemaVersion: "3"
 kind: mixin
 displayName: Swag Lab A/B agent
