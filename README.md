@@ -4,12 +4,8 @@
 > end inside **Docker Sandboxes** — local for dev, cloud for scale — where the
 > **LLM**, **MCP**, **Kits**, and **Policies** each do a real job.
 
-This is a rebuild of [A/B GPT](https://www.daytona.io/dotfiles/winning-daytona-s-hacksprint-with-an-a-b-testing-agent)
-(the Daytona Hacksprint winner) on Docker Sandboxes. The agent shops a
-deliberately-flawed store like a real user, finds where shoppers get stuck,
-writes a fix, proves it with a re-test, and opens a PR — and the two things the
-hackathon demo hand-waved (isolation and credential safety) are exactly what
-Docker Sandboxes makes first-class.
+The agent shops a deliberately-flawed store like a real user, finds where shoppers get stuck, writes a fix, proves it with a re-test, and opens a PR — and the two things the
+hackathon demo hand-waved (isolation and credential safety) are exactly what Docker Sandboxes makes first-class.
 
 The test subject is **fake-docker-swags**: a Docker-swag store (Moby plushies,
 tees, stickers) that ships with **no product filtering or search** — 12 products
