@@ -204,6 +204,14 @@ Note: Concrete numbers from the bundled sample traces. Half the shoppers failed 
 
 ---
 
+## The loop, end to end
+
+![Swag Lab — simulate, analyze, variant, score, trap blocked, PR](assets/swag-lab-demo.gif)
+
+Note: Here's the whole thing in half a minute — the shopper gets stuck, the agent writes the filter variant, it wins in a cloud sandbox, the prompt-injection trap gets blocked, and the PR goes up.
+
+---
+
 ## What you'll do in the lab
 
 In a simulated terminal, you will:
