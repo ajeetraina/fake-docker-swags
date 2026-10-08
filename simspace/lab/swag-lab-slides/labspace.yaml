@@ -1,0 +1,35 @@
+# "Swag Lab — an autonomous A/B testing agent on Docker Sandboxes" presented in
+# Simspace. Authored as native markdown slides (not pre-rendered images), split
+# on lines of exactly `---`, with speaker notes on `Note:`. The sibling
+# hands-on lab's simulator is reused so scripted demos can be spliced in.
+kind: slides
+title: "Swag Lab — Slides"
+description: "The autonomous A/B testing agent for an e-commerce store, built on Docker Sandboxes — and where the LLM, MCP, Kits, and Policies each do real work. Watch the talk, then do the lab."
+
+# Landing-page card. `order: 1` puts the deck ahead of the hands-on lab, so it
+# reads as "watch the talk, then do the lab". labs.json is GENERATED from this
+# block — never edit labs.json by hand.
+catalog:
+  icon: slideshow
+  order: 1
+  tags: ["docker sandboxes", "ai agents", "a/b testing", "agentic security", "slides", "start here"]
+  estimatedMinutes: 25
+
+version: "1.0.0"
+
+# Dark surface to match the Docker /Next deck theme.
+theme: dark
+
+# Reuse the sibling lab's simulator so any spliced-in live demo runs the exact
+# scripted commands learners run in the hands-on lab — the two can't drift.
+simulator: ../swag-lab/simulator.yaml
+
+terminals:
+  - id: demo
+    title: Demo
+    icon: terminal
+
+# `slides:` is the deck alias for `sections:`. One chapter; slides split on `---`.
+slides:
+  - title: Workshop
+    contentPath: deck.md
