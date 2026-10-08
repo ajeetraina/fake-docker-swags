@@ -1,6 +1,6 @@
 # Policies — who can reach what
 
-This is the part the Daytona demo hand-waved and the part Docker Sandboxes makes
+This is the part most agent demos hand-wave and the part Docker Sandboxes makes
 first-class. Two controls do the work:
 
 1. **Network policy** — a deny-by-default global baseline, widened per sandbox

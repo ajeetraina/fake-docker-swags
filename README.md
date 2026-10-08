@@ -4,8 +4,11 @@
 > end inside **Docker Sandboxes** — local for dev, cloud for scale — where the
 > **LLM**, **MCP**, **Kits**, and **Policies** each do a real job.
 
-The agent shops a deliberately-flawed store like a real user, finds where shoppers get stuck, writes a fix, proves it with a re-test, and opens a PR — and the two things the
-hackathon demo hand-waved (isolation and credential safety) are exactly what Docker Sandboxes makes first-class.
+An autonomous A/B testing agent built on Docker Sandboxes. The agent shops a
+deliberately-flawed store like a real user, finds where shoppers get stuck,
+writes a fix, proves it with a re-test, and opens a PR — and the two things
+most such demos hand-wave (isolation and credential safety) are exactly what
+Docker Sandboxes makes first-class.
 
 The test subject is **fake-docker-swags**: a Docker-swag store (Moby plushies,
 tees, stickers) that ships with **no product filtering or search** — 12 products
@@ -15,7 +18,7 @@ in one flat grid. That missing feature is what the agent is meant to discover.
 
 ## How the pieces map
 
-| A/B GPT phase (Daytona) | Here (Docker Sandboxes) |
+| A/B loop phase | Here (Docker Sandboxes) |
 |---|---|
 | Clone repo, serve preview URL | `sbx run ./kits/swag-store` — **local** preview; **cloud** for parallel variants; `sbx ports` publishes it |
 | Simulate users (Browser Use) | the **`browser-use` Kit** — `shop "<goal>" <url>` emits a JSON trace |
@@ -23,7 +26,7 @@ in one flat grid. That missing feature is what the agent is meant to discover.
 | Implement each variant | **Claude Code** in its own sandbox, one git branch per variant |
 | Measure results | the **store-metrics MCP** server → success rate, steps-to-cart, abandonment, friction → a verdict |
 | Open PR with the winner | GitHub MCP / `gh`, token injected by the proxy |
-| *(ran out of time for the loop)* | **closed** — cloud runs the N variant re-tests in parallel |
+| Re-test every variant in parallel | **cloud** runs the N variant re-tests at once |
 
 And the four concepts you asked about, each earning its place:
 
@@ -120,7 +123,7 @@ task success with 5 friction signals → the filter/search variant 100% success,
 
 ---
 
-## Why Docker Sandboxes (vs the original)
+## Why Docker Sandboxes
 
 - **Isolation is the boundary.** Each phase is its own microVM with its own
   kernel, Docker daemon, and network stack. A variant's build cannot touch the

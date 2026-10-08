@@ -2,7 +2,7 @@
 # ──────────────────────────────────────────────────────────────────────────
 # Swag Lab — the A/B testing loop, driven with the sbx CLI.
 #
-# This is the Daytona "A/B GPT" workflow rebuilt on Docker Sandboxes:
+# The full A/B testing workflow on Docker Sandboxes:
 #   LOCAL preview sandbox  +  LOCAL agent sandbox (simulate & analyze)
 #   CLOUD sandboxes        for implementing + scoring N variants in parallel
 # with network/credential POLICIES enforcing what each sandbox may touch, and

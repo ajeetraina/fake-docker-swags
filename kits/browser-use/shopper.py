@@ -4,9 +4,9 @@
 Usage:
     shopper.py "<natural-language task>" <preview-url>
 
-The task is meta-prompted to feel like natural human exploration (per the
-A/B GPT approach): we ask the agent to *shop*, not to test, so the friction it
-hits is real friction a user would hit. Every step — the agent's reasoning and
+The task is meta-prompted to feel like natural human exploration: we ask the
+agent to *shop*, not to test, so the friction it hits is real friction a user
+would hit. Every step — the agent's reasoning and
 the action it took — is captured and printed as JSON so the analysis phase can
 read it.
 
