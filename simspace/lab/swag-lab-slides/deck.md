@@ -93,13 +93,13 @@ Note: The model is both the simulated customer and the developer. As the custome
 
 ## Where MCP fits
 
-Tools are how the agent gets **hands**. Each is an MCP server:
+Tools are how the agent gets **hands**:
 
-- **Browser-Use** — drive a real headless browser (`shop`)
-- **store-metrics** — turn shopper traces into a conversion verdict
-- **GitHub** — open the winning PR
+- **store-metrics** — an **MCP server** that turns shopper traces into a verdict
+- **GitHub** — the GitHub MCP / `gh` opens the winning PR
+- **`shop`** — a command the `browser-use` kit adds, to browse the store
 
-Note: MCP is the connective tissue. The agent can't shop, score, or ship without tools, and each capability shows up as an MCP server it calls.
+Note: store-metrics is a real MCP server the agent calls over the gateway; shop is a CLI the browser-use kit ships. Either way, tools are the connective tissue — the agent can't score, ship, or shop without them.
 
 ---
 
@@ -110,7 +110,7 @@ Each phase is a **v3 Sandbox Kit** — one OCI image that declares what it's all
 | Kit | Kind | Role |
 |-----|------|------|
 | `claude-agent` | workload | the Claude agent environment (provides `claude`) |
-| `browser-use` | mixin | adds the browser + `shop` |
+| `browser-use` | mixin | adds the `shop` command |
 | `ab-agent` | mixin | the loop playbook + GitHub egress + canary |
 | `swag-store` | workload | serves the store preview |
 
