@@ -22,4 +22,4 @@ echo "== cloud variant previews: npm only =="
 run sbx policy allow network --sandbox "preview-*" registry.npmjs.org
 
 echo "== effective policy =="
-run sbx policy inspect
+run sbx policy ls

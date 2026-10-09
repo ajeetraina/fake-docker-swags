@@ -37,8 +37,8 @@ above.) Propagation + cert issuance takes a few minutes; then
 ```bash
 brew install docker/tap/sbx
 sbx login                                   # choose the deny-all baseline
-sbx secret set -g anthropic
-sbx secret set -g github -t "$(gh auth token)"
+sbx secret set anthropic
+sbx secret set github -t "$(gh auth token)"
 (cd mcp/store-metrics && npm install && npm run build)
 ```
 
@@ -66,7 +66,7 @@ DRY_RUN=0 BASE_URL=https://fakestore.dockerworkshop.com ./orchestrator/run-ab-te
 
 What the audience sees, phase by phase:
 
-- **Phase 0** — `sbx policy inspect`: deny-by-default; kits open only what they need.
+- **Phase 0** — `sbx policy ls`: deny-by-default; kits open only what they need.
 - **Phase 1** — baseline is the *live* site (no local preview needed).
 - **Phase 2** — a Claude sandbox (`+browser-use +ab-agent`) shops each goal in
   `tasks.txt`; traces land in `.runs/<ts>/baseline/`. Watch it struggle to

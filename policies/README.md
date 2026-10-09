@@ -16,7 +16,7 @@ Set once (deny everything), then let the kits open what they need:
 
 ```bash
 sbx policy init deny-all          # one-time; `sbx policy reset` to redo
-sbx policy inspect                # effective rules
+sbx policy ls                     # effective rules
 ```
 
 ## Who gets what

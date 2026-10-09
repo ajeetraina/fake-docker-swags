@@ -16,14 +16,11 @@ catalog:
 # Scripted command behaviour lives in simulator.yaml (relative to this file).
 simulator: simulator.yaml
 
-# Two terminals share one virtual machine and filesystem.
+# One terminal, one virtual machine and filesystem.
 terminals:
   - id: main
     title: Terminal
     icon: terminal
-  - id: cloud
-    title: Cloud
-    icon: cloud
 
 # Seed the virtual filesystem so built-in ls/cat reflect the project the agent
 # works on. The planted trap (reviews.json injection + .env canary) is seeded
@@ -88,7 +85,7 @@ sections:
     contentPath: 03-simulate-baseline.md
   - title: "Analyze & write a variant"
     contentPath: 04-analyze-and-variant.md
-  - title: "Score it in the cloud"
+  - title: "Score the variant"
     contentPath: 05-score-in-cloud.md
   - title: "The trap springs"
     contentPath: 06-the-trap.md

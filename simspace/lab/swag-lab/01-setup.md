@@ -25,11 +25,11 @@ These go into the host keychain. The proxy injects them as auth headers on
 allowed hosts — **the raw values never enter a sandbox.**
 
 ```bash terminal-id=main
-sbx secret set -g anthropic
+sbx secret set anthropic
 ```
 
 ```bash terminal-id=main
-sbx secret set -g github -t "$(gh auth token)"
+sbx secret set github -t "$(gh auth token)"
 ```
 
 > [!IMPORTANT]
@@ -39,10 +39,10 @@ sbx secret set -g github -t "$(gh auth token)"
 ## 4. Confirm the policy baseline
 
 ```bash terminal-id=main
-sbx policy inspect
+sbx policy ls
 ```
 
-You should see **deny-by-default** — nothing is reachable until a Kit (or an
-explicit rule) allows it.
+You should see the **deny-by-default** global baseline — nothing is reachable
+until a Kit (or an explicit rule) allows it.
 
-When the baseline reads `default: deny`, continue to **Meet the store**.
+When the baseline reads `deny-all`, continue to **Meet the store**.

@@ -109,13 +109,16 @@ Each phase is a **v3 Sandbox Kit** — one OCI image that declares what it's all
 
 | Kit | Kind | Role |
 |-----|------|------|
-| `swag-store` | workload | serves the store preview |
+| `claude-agent` | workload | the Claude agent environment (provides `claude`) |
 | `browser-use` | mixin | adds the browser + `shop` |
-| `ab-agent` | mixin | the loop playbook + GitHub egress |
+| `ab-agent` | mixin | the loop playbook + GitHub egress + canary |
+| `swag-store` | workload | serves the store preview |
 
-`docker build`, `docker push`, `sbx run`. Just images.
+```bash
+sbx run ./kits/claude-agent ./store --kit ./kits/browser-use --kit ./kits/ab-agent
+```
 
-Note: A Kit is a normal Docker image that also carries its rules in a manifest annotation. A workload is the thing that runs; mixins stack onto it. The whole pipeline is a handful of versioned artifacts anyone can pull and run.
+Note: A Kit is a normal Docker image that also carries its rules in a manifest annotation. A workload is the thing that runs — you get exactly one; mixins stack onto it. The agent is the claude-agent workload with the browser-use and ab-agent mixins composed on. The whole pipeline is a handful of versioned artifacts anyone can pull and run.
 
 ---
 
@@ -125,9 +128,8 @@ Note: A Kit is a normal Docker image that also carries its rules in a manifest a
 
 | Sandbox | May reach |
 |---------|-----------|
-| `swag-preview` | npm — **and nothing else** |
-| `swag-agent` | the LLM, the preview, GitHub |
-| `preview-*` (cloud) | npm only |
+| `swag-agent` (claude-agent + mixins) | the LLM, the store, GitHub |
+| `swag-store` preview | npm — **and nothing else** |
 
 Plus **credential proxying**: the raw tokens never enter the VM.
 
@@ -137,17 +139,19 @@ Note: Composing a Kit is granting its hosts — scoped to that one sandbox. The 
 
 ## Local and Cloud
 
-- **Local** (Rancher Desktop / your laptop) — develop the loop, one preview at a time
-- **Cloud** — fan out: N variants previewed and shopped **in parallel**
+- **Local** (Rancher Desktop / your laptop) — develop the loop, workspace mounted
+- **Cloud** — fan out: run many agents **in parallel** (repo cloned in, no host mount)
 
 ```bash
-sbx run ./kits/swag-store ./store          # local
-sbx --cloud run ./kits/swag-store --new    # cloud
+# local — your workspace is mounted
+sbx run ./kits/claude-agent ./store --kit ./kits/browser-use --kit ./kits/ab-agent
+# cloud — same kits, no host path
+sbx --cloud run ./kits/claude-agent --kit ./kits/browser-use --kit ./kits/ab-agent
 ```
 
 Same Kits, same policies, two scales.
 
-Note: You build and debug locally, then push the heavy fan-out to the cloud without changing a thing about the Kits or the policy model. That's the "local and cloud sandboxing" story in one slide.
+Note: You build and debug locally with your workspace mounted, then fan out to the cloud without changing a thing about the Kits or the policy model. Cloud sandboxes have no host workspace, so the repo is cloned in rather than mounted. That's the "local and cloud sandboxing" story in one slide.
 
 ---
 

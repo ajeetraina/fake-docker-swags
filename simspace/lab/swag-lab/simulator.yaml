@@ -38,8 +38,7 @@ scenarios:
       command: [sbx, version]
     then:
       output:
-        - "sbx version 1.4.0"
-        - "sandboxd running · default policy: deny-all"
+        - "sbx version: v0.45.1 9d79d90ee4c5d297fb3d36b75384e8cea7a4fbcb"
 
   - id: sbx-login
     when:
@@ -53,20 +52,19 @@ scenarios:
   - id: sbx-secret-set
     when:
       command: [sbx, secret, set]
-      args: { -g: { any: true } }
+      args: { 0: { any: true } }
     then:
       output:
-        - "Secret '{{ args.g }}' stored in the host OS keychain."
+        - "Secret '{{ args.0 }}' stored in the host keychain (global scope)."
         - "It will be injected as an auth header by the proxy — never written into a sandbox."
 
-  - id: sbx-policy-inspect
+  - id: sbx-policy-ls
     when:
-      command: [sbx, policy, inspect]
+      command: [sbx, policy, ls]
     then:
       output:
-        - "GLOBAL POLICY"
-        - "  default: deny"
-        - "  (sandboxes reach nothing until a kit or an explicit rule allows it)"
+        - "POLICY   SOURCE    APPLIES TO      SUMMARY"
+        - "global   default   all sandboxes   deny-all — nothing allowed until a kit or rule opens it"
 
   - id: sbx-mcp-add
     when:
@@ -98,27 +96,21 @@ scenarios:
         - "↑ the exfiltration attempt was blocked at the proxy."
 
   # ---------------------------------------------------------------------------
-  # Sandboxes — run (local agent) and run --cloud (variant preview)
+  # Compose the agent sandbox: the claude-agent WORKLOAD kit (provides `claude`)
+  # with the browser-use and ab-agent MIXINS layered on. This is the three-kit
+  # composition — `sbx run ./kits/claude-agent … --kit … --kit …`.
   # ---------------------------------------------------------------------------
-  - id: sbx-run-cloud-preview
-    when:
-      command: [sbx, --cloud, run]
-    then:
-      output:
-        - { text: "Creating CLOUD sandbox 'preview-filter-search' (branch variant/filter-search)…", delay: boot }
-        - "Preview URL: https://preview-filter-search.sandbox.cloud"
-        - "egress: registry.npmjs.org only"
-
   - id: sbx-run-agent
     when:
       command: [sbx, run]
-      args: { 0: { oneOf: [claude] } }
+      args: { 0: { oneOf: ["./kits/claude-agent"] } }
     then:
       state: { agent.running: true }
       output:
-        - { text: "Creating sandbox 'swag-agent' (claude + browser-use + ab-agent)…", delay: boot }
+        - { text: "Building kits: claude-agent (workload) + browser-use + ab-agent (mixins)…", delay: boot }
+        - { text: "Creating sandbox 'swag-agent'…", delay: boot }
         - "microVM booted: own kernel, own network, workspace mounted at /workspace."
-        - "egress (from the kits): api.anthropic.com, the preview host, github.com."
+        - "composed: claude (agent) · shop (browser-use) · AB playbook + GitHub egress (ab-agent)."
         - "Detached. Drive it with: sbx exec swag-agent -- <command>"
 
   # ---------------------------------------------------------------------------
@@ -126,19 +118,8 @@ scenarios:
   # tail (promptContains). ORDER MATTERS — most specific first.
   # ---------------------------------------------------------------------------
 
-  # Cloud re-test of the variant → SUCCESS (matched by the --cloud flag, so it
-  # wins over the baseline "warm" scenario below).
-  - id: exec-cloud-shop-variant
-    when:
-      command: [sbx, --cloud, exec]
-    then:
-      output:
-        - { text: "[shopper] https://preview-filter-search.sandbox.cloud", delay: shop }
-        - "[shopper] There's a search box and category filters at the top."
-        - "[shopper] Filtering by 'Apparel' → the Captain Hoodie. Adding to cart."
-        - '{ "task": "find something warm", "success": true, "steps": 3, "frictionSignals": 0 }'
-
-  # Ask the store-metrics MCP to compare variant vs baseline.
+  # Ask the agent to serve the variant, re-shop it, and compare to baseline via
+  # the store-metrics MCP — all inside the one composed sandbox.
   - id: exec-compare
     when:
       command: [sbx, exec]
@@ -149,6 +130,10 @@ scenarios:
           tool: compare_variants
           args: { baselineDir: ".runs/baseline", variantDir: ".runs/variant-filter-search" }
       output:
+        - "[claude] checked out variant/filter-search, built it, served it locally."
+        - "[shopper] search + category filters now present → filtered Apparel → added the hoodie."
+        - "[shopper] variant run: success, 0 friction."
+        - ""
         - "store-metrics → compare_variants"
         - ""
         - "                 baseline   variant"

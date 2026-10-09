@@ -44,23 +44,29 @@ And the four concepts you asked about, each earning its place:
 ## Architecture
 
 ```
-                    ┌─────────────────────────── host (sbx) ───────────────────────────┐
-                    │  policy: deny-all baseline + per-sandbox allow (from the kits)     │
-                    │  secrets: anthropic, github  →  proxy injects headers              │
-                    └────────────────────────────────────────────────────────────────────┘
-                                   │                                   │
-          LOCAL                    ▼                                   ▼            CLOUD
-  ┌───────────────────┐   ┌──────────────────────────┐      ┌───────────────────────────┐
-  │  swag-preview      │   │  swag-agent               │      │  preview-<variant> × N     │
-  │  kit: swag-store   │◄──│  kits: claude +           │      │  kit: swag-store (branch)  │
-  │  serves store :3000│   │        browser-use +      │─────►│  each shopped in parallel  │
-  │  egress: npm only  │   │        ab-agent           │      │  egress: npm only          │
-  └───────────────────┘   │  • shop  → traces         │      └───────────────────────────┘
-                          │  • claude → variants       │                   │
-                          │  • MCP store-metrics → score                   │
-                          │  • gh → PR (token injected)│◄──────────────────┘
-                          └──────────────────────────┘
+          ┌──────────────────────── host (sbx) ─────────────────────────┐
+          │  policy: deny-all baseline + per-sandbox allow (from kits)   │
+          │  secrets: anthropic, github  →  proxy injects headers        │
+          └──────────────────────────────────────────────────────────────┘
+                      │                                   │
+                      ▼                                   ▼
+   ┌─────────────────────────────────┐      ┌────────────────────────────┐
+   │  swag-agent  (3 kits composed)  │      │  swag-store  (preview)      │
+   │   claude-agent  (workload)      │─────►│  kit: swag-store            │
+   │   + browser-use (mixin → shop)  │      │  serves the variant :3000   │
+   │   + ab-agent    (mixin)         │      │  egress: npm only           │
+   │                                 │      └────────────────────────────┘
+   │  • shop      → baseline traces  │
+   │  • claude    → variant branch   │          live baseline:
+   │  • serve + re-shop → variant run│       fakestore.dockerworkshop.com
+   │  • store-metrics MCP → verdict  │
+   │  • gh        → PR (token proxied)│
+   └─────────────────────────────────┘
 ```
+
+> Scale out by running several `swag-agent` sandboxes in **Docker Cloud**
+> (`sbx --cloud run …`) — same kits, same policies. Cloud sandboxes have no host
+> workspace, so the repo is cloned in rather than mounted.
 
 ---
 
@@ -69,14 +75,16 @@ And the four concepts you asked about, each earning its place:
 ```
 store/                     the swag store (React/Vite/TS) — the test subject, no filter/search
 kits/
-  swag-store/              workload kit: serves the mounted store as a preview
+  claude-agent/            workload kit: the Claude agent env (provides `claude`)
   browser-use/             mixin: Browser-Use + headless Chromium → `shop`
-  ab-agent/                mixin: the A/B playbook + GitHub egress/credential
+  ab-agent/                mixin: the A/B playbook + GitHub egress + canary
+  swag-store/              workload kit: serves the store as a preview
 mcp/store-metrics/         MCP server: shopper traces → conversion verdict
 orchestrator/
-  run-ab-test.sh           drives the 5-phase loop over sbx (local + cloud)
+  run-ab-test.sh           drives the loop over sbx
   tasks.txt                shopper goals
 policies/                  the deny-by-default model + an explicit apply.sh
+simspace/                  the slides + hands-on lab (hosted at swaglab.dockerworkshop.com)
 ```
 
 ---
@@ -87,8 +95,8 @@ policies/                  the deny-by-default model + an explicit apply.sh
 # 0. prerequisites
 brew install docker/tap/sbx
 sbx login                                   # pick the Locked Down / deny-all baseline
-sbx secret set -g anthropic                 # LLM
-sbx secret set -g github -t "$(gh auth token)"   # for the PR
+sbx secret set anthropic                    # LLM
+sbx secret set github -t "$(gh auth token)" # for the PR
 
 # 1. the store runs on its own (sanity check)
 cd store && npm install && npm run dev      # http://localhost:3000  (no filters — that's the point)
@@ -110,14 +118,14 @@ DRY_RUN=0 ./orchestrator/run-ab-test.sh
 
 ## The loop (what `run-ab-test.sh` does)
 
-1. **Policy** — confirm the deny-by-default baseline; kits open only what they need.
-2. **Local preview** — `sbx run ./kits/swag-store ./store`, publish port 3000.
-3. **Simulate** — a Claude sandbox (`+browser-use +ab-agent`) runs each goal in
-   `tasks.txt` with `shop`, capturing baseline traces.
+1. **Policy** — `sbx policy ls` shows the deny-by-default baseline; kits open only what they need.
+2. **Compose the agent** — `sbx run ./kits/claude-agent ./store --kit ./kits/browser-use --kit ./kits/ab-agent`.
+3. **Simulate** — the composed agent runs each goal in `tasks.txt` with `shop`
+   against the live store, capturing baseline traces.
 4. **Analyze & generate** — Claude reads the traces, finds the top friction
-   point (shoppers can't narrow 12 products), writes variants on branches.
-5. **Score in the cloud** — `sbx --cloud` previews + re-shops every variant in
-   parallel; the store-metrics MCP compares each to baseline.
+   point (shoppers can't narrow 12 products), writes a variant on a branch.
+5. **Score** — the agent serves each variant and re-shops it; the store-metrics
+   MCP compares to baseline. (Fan out across cloud sandboxes to scale.)
 6. **PR** — the best variant is opened as a pull request; the GitHub token is
    injected by the proxy, never seen by the agent.
 
@@ -158,8 +166,14 @@ kept in a private answer key, out of this repo on purpose.
 
 ## Status
 
-Everything here is real and builds: the store (`npm run build` ✓), all three
-kit descriptors (`docker buildx ... cacheonly` ✓), and the MCP server
-(`tsc` ✓, verdict verified on sample traces). The orchestrator is a faithful,
-runnable driver — `DRY_RUN=1` prints the exact `sbx` commands; `DRY_RUN=0`
-executes them once you've logged in and stored secrets.
+Everything here is real and **tested against `sbx v0.45.1`**:
+
+- the store builds (`npm run build` ✓);
+- all four kits build, and the three-kit composition **boots coherently** —
+  `sbx run ./kits/claude-agent ./store --kit ./kits/browser-use --kit ./kits/ab-agent`
+  comes up with `claude`, `shop`, and the canary env var all present inside ✓;
+- the MCP server registers with `sbx mcp add store-metrics --command node --args …` ✓,
+  and its verdict is verified on the sample traces (`tsc` ✓).
+
+The orchestrator is a faithful driver — `DRY_RUN=1` prints the exact `sbx`
+commands; `DRY_RUN=0` executes them once you've logged in and stored secrets.

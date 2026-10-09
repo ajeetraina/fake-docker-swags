@@ -48,17 +48,13 @@ out "${mag}[claude]${reset} branch: ${bold}variant/filter-search${reset}"
 pause
 
 # ── BEAT 4 ────────────────────────────────────────────────────────────────
-beat "4 · Score the variant in an isolated CLOUD sandbox"
-cmd "sbx --cloud run ./kits/swag-store --name preview-filter-search --new"
-out "${grey}creating cloud sandbox (branch variant/filter-search)…${reset}"
-out "preview → ${cyan}https://preview-filter-search.sandbox.cloud${reset}"
-pause 0.4
-cmd "sbx --cloud exec preview-filter-search -- shop \"find something warm\""
-out "${cyan}[shopper]${reset} search + category filters at the top. Filtering by \"Apparel\"."
+beat "4 · Score the variant (serve, re-shop, compare via MCP)"
+cmd "sbx exec swag-agent -- claude -p \"serve variant/filter-search, re-shop it, compare to baseline via store-metrics MCP\""
+out "${mag}[claude]${reset} checked out variant/filter-search, built it, serving locally."
+out "${cyan}[shopper]${reset} search + category filters now present. Filtering by \"Apparel\"."
 out "${cyan}[shopper]${reset} found the Captain Hoodie. ${green}Added to cart.${reset}"
 out "${green}{ \"success\": true, \"steps\": 3, \"frictionSignals\": 0 }${reset}"
 pause 0.4
-cmd "sbx exec swag-agent -- claude -p \"compare variant vs baseline via store-metrics MCP\""
 out "${dim}store-metrics →${reset} ${bold}compare_variants${reset}"
 out ""
 out "                   ${grey}baseline${reset}   ${bold}variant${reset}"

@@ -4,19 +4,22 @@ Now we put a shopper in front of the live store and watch where they struggle.
 
 ## 1. Start the agent sandbox
 
-One Claude sandbox, composed with two mixins — `browser-use` gives it a real
-headless browser (`shop`), `ab-agent` gives it the loop playbook:
+Compose three Kits into one sandbox: the **`claude-agent`** workload kit (the
+Claude Code agent — it *provides* the `claude` capability), plus two mixins —
+**`browser-use`** gives it a real headless browser (`shop`), and **`ab-agent`**
+gives it the loop playbook, GitHub egress, and the planted canary:
 
 ```bash terminal-id=main
-sbx run claude ./store --name swag-agent --kit ./kits/browser-use --kit ./kits/ab-agent --detached
+sbx run ./kits/claude-agent ./store --name swag-agent --kit ./kits/browser-use --kit ./kits/ab-agent --detached
 ```
 
 ## 2. Wire up the scorer (MCP)
 
-Register the **store-metrics** MCP server so the agent can score variants later:
+Register the **store-metrics** MCP server so the agent can score variants later
+(a local stdio server — `--command`/`--args`, not a trailing `--`):
 
 ```bash terminal-id=main
-sbx mcp add store-metrics -- node mcp/store-metrics/dist/index.js
+sbx mcp add store-metrics --command node --args mcp/store-metrics/dist/index.js
 ```
 
 ## 3. Let the shopper reach the live store
