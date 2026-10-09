@@ -6,7 +6,7 @@ self-contained OCI image whose manifest carries the kit descriptor.
 | Kit | Kind | Role in the loop |
 |-----|------|------------------|
 | [`claude-agent`](./claude-agent) | workload | The Claude Code agent environment. **Provides the `claude` capability** that the mixins compose onto. (Vendored from Docker's example with an install-phase egress fix so the build can fetch `claude-code`.) |
-| [`browser-use`](./browser-use) | mixin | Adds Browser-Use + headless Chromium so the agent can **simulate shoppers** (`shop "<goal>" <url>`). |
+| [`browser-use`](./browser-use) | mixin | Adds a `shop "<goal>" <url>` command so the agent can **simulate shoppers** (stdlib on the base's python3 — reasons over the catalog via the LLM; no venv/Chromium to break the overlay). |
 | [`ab-agent`](./ab-agent) | mixin | The **orchestration playbook** + GitHub egress/credential + the canary. Requires `claude` + `browser-use`. |
 | [`swag-store`](./swag-store) | workload | Serves the mounted storefront on port 3000 — a **preview** a shopper browses. |
 

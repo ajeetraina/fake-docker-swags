@@ -1,48 +1,40 @@
 # syntax=docker/sandbox-kit:3
-# Browser-Use + Playwright (headless Chromium) as a MIXIN, so any agent
-# workload can be turned into a shopper simulator. It layers the Python tool
-# and a browser into the composition; the agent that drives it (Claude, Codex,
-# …) and that agent's credential ride with the workload underneath. This is the
-# "simulate realistic users" phase of the A/B loop, packaged once and reusable.
+# A shopper-simulator MIXIN: it layers a `shop` command onto any agent workload
+# so the agent can "shop" a storefront and log where it gets stuck. The command
+# is a stdlib python runner that reads the store's catalog and reasons as a
+# shopper via the agent's own LLM — no venv and no bundled browser, because
+# neither travels cleanly as a build-time overlay (a venv's interpreter symlink
+# dangles on a different base, and Chromium's native libs must live in the
+# running base). The agent that drives it and its credential ride with the
+# workload underneath.
 schemaVersion: "3"
 kind: mixin
-displayName: Browser-Use (shopper simulator)
+displayName: Shopper simulator (shop)
 author: "Ajeet Singh Raina"
 description: >-
-  Browser-Use with a headless Chromium (via Playwright) as an overlay. Compose
-  it onto an agent workload to let the agent navigate a preview URL like a real
-  shopper and log its reasoning step by step.
-sourceUrl: https://github.com/browser-use/browser-use
+  Adds a `shop "<goal>" <url>` command that reasons over a storefront's catalog
+  as a shopper and emits a JSON trace. Pure stdlib on the base's python3 — no
+  venv, no Chromium — so it composes onto any agent workload.
+sourceUrl: https://github.com/ajeetraina/fake-docker-swags
+version: "0.2.0"
 
 args:
-  version:
-    default: "0.1.40"
-    pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'
-    description: browser-use PyPI release to install
-    buildArg: BROWSER_USE_VERSION
   previewHost:
     default: "host.docker.internal:443"
     description: >-
       Host:port of the swag-store preview the simulator shops against. Override
       for a cloud run, e.g. a published preview hostname.
 
-provides: ["browser-use@${{ kit.args.version }}"]
+provides: ["browser-use@0.2.0"]
 
 capabilities:
   - type: com.docker.sandbox/network-policy@1
     config:
-      # Build pulls the package from PyPI and the Chromium build from the
-      # Playwright CDN.
-      install:
-        allow:
-          - pypi.org
-          - files.pythonhosted.org
-          - playwright.azureedge.net
-          - cdn.playwright.dev
-      # At run time the simulator reaches two things: the preview URL it shops
-      # against, and the LLM that decides its next click. The preview host is
-      # an arg so a cloud run can point at a cloud preview; api.anthropic.com
-      # is where the proxy injects the agent's credential.
+      # At run time the shopper reaches two things: the storefront it shops
+      # (the preview host, an arg so a cloud run can point elsewhere) and the
+      # LLM that reasons for it. api.anthropic.com is where the proxy injects
+      # the agent's credential — the shopper never holds a key. No install
+      # phase: the overlay ships two files and builds nothing.
       runtime:
         allow:
           - api.anthropic.com

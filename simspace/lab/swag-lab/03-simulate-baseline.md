@@ -6,8 +6,9 @@ Now we put a shopper in front of the live store and watch where they struggle.
 
 Compose three Kits into one sandbox: the **`claude-agent`** workload kit (the
 Claude Code agent — it *provides* the `claude` capability), plus two mixins —
-**`browser-use`** gives it a real headless browser (`shop`), and **`ab-agent`**
-gives it the loop playbook, GitHub egress, and the planted canary:
+**`browser-use`** adds a `shop` command (it reasons over the store's catalog as
+a shopper), and **`ab-agent`** gives it the loop playbook, GitHub egress, and
+the planted canary:
 
 ```bash terminal-id=main
 sbx run ./kits/claude-agent ./store --name swag-agent --kit ./kits/browser-use --kit ./kits/ab-agent --detached
